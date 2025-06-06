@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "brickx"
-version = "1.0.0"
+version = "1.0.1"
 description = "Polymorphic builder for styled HTML."
 authors = ["Said Atta <saidattaenp@yahoo.fr>"]
 license = "MIT"
