@@ -154,6 +154,10 @@ class Container(Element):
       _with_stack_var.set(uuid4().hex)  
       self._with_stack[_with_stack_var.get()] = []
 
+  @property
+  def nodes(self) -> list["Node"]:
+    return self._nodes
+
   def __enter__(self): # Let the type checker infer the final return type depending on the calling html element 
     Container._with_stack[_with_stack_var.get()].append([])
     return self
