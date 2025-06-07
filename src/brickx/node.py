@@ -18,15 +18,18 @@ class Node(ABC):
       self.collect() 
 
   def __str__(self) -> str:
+    return self.render_inline()
+  
+  def __format__(self, format_spec: str) -> str:
     # TODO
-    # # Used for paragraph composing with f strings in the context of with manager.
-    # # Usage:
-    # # with (node := Foo()):
-    # #  f"bar{Baz()}" >> Text(escape=False) 
-    # # assert node.render_inline() == "<foo>bar<baz></baz></foo>"
+    # Used for paragraph composing with f strings in the context of with manager.
+    # Usage:
+    # with (node := Foo()):
+    #  f"bar{Baz()}" >> Text(escape=False) 
+    # assert node.render_inline() == "<foo>bar<baz></baz></foo>"
 
-    # if (context := Container._with_stack[_with_stack_var.get()]):
-    #   context[-1].remove(self)
+    if (context := Container._with_stack[_with_stack_var.get()]):
+      context[-1].remove(self)
 
     return self.render_inline()
   
