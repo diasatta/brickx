@@ -970,7 +970,7 @@ class Textarea(Container):
   tag_name: str = "textarea"
 
   def __init__(self, *children: Node | str | int | float, **attrs: Unpack[TextareaAttrs]) -> None:
-    super().__init__(*children, **attrs) # type: ignore
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> TextareaAttrs:

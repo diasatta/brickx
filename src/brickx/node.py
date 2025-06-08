@@ -307,7 +307,7 @@ class Container(Element):
     elif type(child) in (str, int, float, bool):
       child_ = Text(str(child)) 
     else:
-      child_: Node = child # type: ignore
+      child_: Node = cast(Node, child)
 
     if child_.parent is not None:
       raise Exception(f"Node {type(self)} already having a parent. Free the node before inserting it again.")  
