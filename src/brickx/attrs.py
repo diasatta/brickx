@@ -1118,7 +1118,7 @@ class TextareaAttrs(GlobalAttrs, total=False):
   h_readonly: bool
   h_required: bool
   h_rows: str
-  h_spellcheck: TextareaSpellcheckL
+  # h_spellcheck: TextareaSpellcheckL
   h_wrap: TextareaWrapL
 
 class ThAttrs(GlobalAttrs, total=False):
