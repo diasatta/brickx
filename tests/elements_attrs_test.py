@@ -354,7 +354,7 @@ class TestFormAttrs():
 
 class TestHtmlAttrs():
   def test_xmlns(self) -> None:
-    assert Html(h_xmlns='www.foo.bar/baz/?quux="1"').render_attrs() == 'xmlns="www.foo.bar/baz/?quux=&quot;1&quot;"'  # type: ignore
+    assert Html(h_xmlns='http://www.w3.org/1999/xhtml').render_attrs() == 'xmlns="http://www.w3.org/1999/xhtml"'
 
 class TestIframeAttrs():
   def test_allow(self) -> None:
