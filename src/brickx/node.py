@@ -3,9 +3,14 @@ from abc import ABC
 from contextvars import ContextVar
 from uuid import uuid4
 from copy import deepcopy
+from enum import Enum
+from typing import cast, Unpack
 import html
+from brickx.attrs import GlobalAttrs
 
 _with_stack_var: ContextVar[str | None] = ContextVar('_with_stack', default=None)
+
+PREFIXED_ATTRS: tuple[str, ...] = ("aria", "data", "user")
 
 class Node(ABC):
   tag_name: str = "node"
@@ -121,14 +126,63 @@ class Text(Node):
 class Element(Node): 
   tag_name: str = "element"
 
-  def __init__(self) -> None:
+  def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
     super().__init__()
+
+    self._attrs: dict[str, str | dict[str, str]] = {}
+
+    for attr in attrs:
+      if attr.startswith(("h_", "data", "aria", "user", "hx_")):
+        self._attrs[attr] = attrs[attr]
+
+  @property
+  def attrs(self) -> GlobalAttrs:
+    return cast(GlobalAttrs, self._attrs)  
+  
+  def render_attr(self, name: str, value: str | bool | None | dict[str, str], remove_prefix: bool = True) -> str:
+    name = name.removeprefix("h_") if remove_prefix else name
+    name = name.replace("_", "-")
+
+    if type(value) == bool:
+      if value:
+        return name
+      else:
+        return ""
+
+    if value is None:
+      return ""
+
+    # TODO: review escaping for js and other contexts
+    return f'{name}="{html.escape(str(value), quote=True)}"'
+
+  def render_attrs(self) -> str:
+    attrs: list[str] = []
+    output = ""
+    for key, value in self._attrs.items():
+      if type(value) == dict:
+        if key in PREFIXED_ATTRS:
+          l = []
+          for k, v in value.items():
+            if key == "user":
+              l.append(self.render_attr(f'{k}', v, False))
+            else:
+              l.append(self.render_attr(f'{key}-{k}', v))
+
+            output = " ".join(l)
+        else:
+          raise TypeError(f"Dict. values not allowed for attribute '{key}'.")
+      else:
+        output = self.render_attr(key, value)
+
+      attrs.append(output)
+
+    return " ".join(attrs).strip()
   
   def start_tag(self, level: int = 0, spaces: int | None = 2) -> str:
     indent = "" if spaces is None else " " * level * spaces
     
-    html = f"{indent}<{self.tag_name}>"
-
+    attrs = self.render_attrs()
+    html = f"{indent}<{self.tag_name}{' ' + attrs if attrs != '' else ''}>"
     return html 
   
   def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
@@ -142,8 +196,8 @@ class Container(Element):
 
   _with_stack: dict[str | None, list[list["Node"]]] = {}
 
-  def __init__(self, *nodes: Node | str | int | float | None) -> None:
-    super().__init__()
+  def __init__(self, *nodes: Node | str | int | float | None, **attrs: Unpack[GlobalAttrs]) -> None:
+    super().__init__(**attrs)
 
     self._nodes: list[Node] = []
 
