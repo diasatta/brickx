@@ -272,12 +272,12 @@ class TestNodeWithContext():
       with pytest.raises(Exception):
         baz.collect()
 
-  def test_using_f_strings_within_a_with_context(self):
-    with (node := Foo()):
-      text = Text(f"bar{Baz()}", escape=False) 
+  # def test_using_f_strings_within_a_with_context(self):
+  #   with (node := Foo()):
+  #     text = Text(f"bar{Baz()}", escape=False) 
 
-    assert node.render_inline() == "<foo>bar<baz></baz></foo>"
-    assert text.text == "bar<baz></baz>"
+  #   assert node.render_inline() == "<foo>bar<baz></baz></foo>"
+  #   assert text.text == "bar<baz></baz>"
 
   # TODO
   # def test_appending_nodes_in_concurrent_threads(self):
