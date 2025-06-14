@@ -3,10 +3,11 @@ from abc import ABC
 from contextvars import ContextVar
 from uuid import uuid4
 from copy import deepcopy
-from enum import Enum
 from typing import cast, Unpack
-import html
+import html, hashlib
 from brickx.attrs import GlobalAttrs
+from brickx.style import Rule
+from brickx.styler import Styler, StyleDict
 
 _with_stack_var: ContextVar[str | None] = ContextVar('_with_stack', default=None)
 
@@ -19,8 +20,20 @@ class Node(ABC):
   def __init__(self) -> None:
     self.parent: "Container | None" = None
 
+    self._styler = Styler()
+
     if Container._with_stack.get(_with_stack_var.get(), None):
       self.collect() 
+
+  @property
+  def styler(self) -> Styler:
+    return self._styler
+    
+  @styler.setter
+  def styler(self, styler: Styler):
+    rules = self._styler._style
+    self._styler = styler
+    self._styler._style = rules
 
   def __str__(self) -> str:
     return self.render_inline()
@@ -91,6 +104,9 @@ class Node(ABC):
   def __rmul__(self, count: int) -> "Container":    
     return self.__mul__(count) 
   
+  def classes(self) -> dict:  
+    return {}
+  
 class Text(Node):
   def __init__(self, text: str = "", escape=True) -> None:
     super().__init__()
@@ -126,10 +142,13 @@ class Text(Node):
 class Element(Node): 
   tag_name: str = "element"
 
-  def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
+  def __init__(self, style: Rule | list[Rule] | None = None, **attrs: Unpack[GlobalAttrs]) -> None:
     super().__init__()
 
     self._attrs: dict[str, str | dict[str, str]] = {}
+
+    if style is not None:
+        self.style = style
 
     for attr in attrs:
       if attr.startswith(("h_", "data", "aria", "user", "hx_")):
@@ -137,8 +156,16 @@ class Element(Node):
 
   @property
   def attrs(self) -> GlobalAttrs:
-    return cast(GlobalAttrs, self._attrs)  
-  
+    return cast(GlobalAttrs, self._attrs) 
+
+  @property
+  def style(self) -> StyleDict:
+    return self._styler._style
+
+  @style.setter
+  def style(self, rules: Rule | list[Rule]): 
+    self.styler.style = rules
+
   def render_attr(self, name: str, value: str | bool | None | dict[str, str], remove_prefix: bool = True) -> str:
     name = name.removeprefix("h_") if remove_prefix else name
     name = name.replace("_", "-")
@@ -156,6 +183,16 @@ class Element(Node):
     return f'{name}="{html.escape(str(value), quote=True)}"'
 
   def render_attrs(self) -> str:
+    classes = self.attrs.get("h_class", "")
+    class_names = self.class_names()
+
+    if class_names:
+      class_names.append(classes)
+      self.attrs["h_class"] = " ".join(class_names).strip()
+
+    if self._styler.declarations():
+      self.attrs["h_style"] = " ".join(self._styler.declarations())
+
     attrs: list[str] = []
     output = ""
     for key, value in self._attrs.items():
@@ -176,6 +213,9 @@ class Element(Node):
 
       attrs.append(output)
 
+    if classes:
+      self.attrs["h_class"] = classes
+
     return " ".join(attrs).strip()
   
   def start_tag(self, level: int = 0, spaces: int | None = 2) -> str:
@@ -190,14 +230,35 @@ class Element(Node):
     markup += self.start_tag(level, spaces)
 
     return markup
+  
+  def class_names(self) -> list[str]: 
+    return self._styler.class_names()
+  
+  def classes(self) -> dict:
+    return self._styler.classes()
+  
+  def render_style(self) -> str:
+    return self._styler.render(self.classes())
+  
+  def style_file_name(self, folder_path: str = "") -> str:
+    style = self.render_style()
+    file_name: str = self.tag_name + '-' + hashlib.sha1(style.encode()).hexdigest()[:self.styler.file_name_length]
+    
+    folder_path = folder_path.removesuffix("/")
+    return f"{folder_path}{"/" if folder_path else ""}{file_name}.css"
+  
+  def write_style_file(self, folder_path: str = ""):
+    file_path = self.style_file_name(folder_path)
+    with open(file_path, "w") as f:
+      f.write(self.render_style())
 
 class Container(Element):
   tag_name: str = "container"
 
   _with_stack: dict[str | None, list[list["Node"]]] = {}
 
-  def __init__(self, *nodes: Node | str | int | float | None, **attrs: Unpack[GlobalAttrs]) -> None:
-    super().__init__(**attrs)
+  def __init__(self, *nodes: Node | str | int | float | None, style: Rule | list[Rule] | None = None, **attrs: Unpack[GlobalAttrs]) -> None:
+    super().__init__(style=style, **attrs)
 
     self._nodes: list[Node] = []
 
@@ -271,6 +332,10 @@ class Container(Element):
     inline = self.inline or spaces is None or not self._nodes
     new_line = "" if inline else "\n"
 
+    for node in self._nodes:
+      if type(node.styler) != type(self.styler):
+        node.styler = deepcopy(self.styler)
+
     markup += new_line.join(node.render(level, None if inline else spaces) for node in self._nodes)  
 
     return html.escape(markup) if escape else markup
@@ -325,6 +390,15 @@ class Container(Element):
   
   def append(self, node: "Node | str | int | float") -> "Node":
     return self.insert(node)
+  
+  def classes(self) -> dict:  
+    styles = self._styler.classes()
+    for node in self._nodes:
+      if type(node.styler) != type(self.styler):
+        node.styler = deepcopy(self.styler)
+      styles = self._styler.merge_classes(styles, node.classes())
+
+    return styles 
     
 class Root(Container):
   tag_name: str = "root"
