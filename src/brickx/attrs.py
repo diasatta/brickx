@@ -729,10 +729,13 @@ VideoPreloadL = Literal[
 
 from typing import TypedDict
 
+class AttrTypedDict(TypedDict, total=False):
+  pass
+
 class GlobalAttrs(TypedDict, total=False):
-  aria: dict[str, str]
-  data: dict[str, str]
-  user: dict[str, str]
+  aria: dict[str, str] | AttrTypedDict
+  data: dict[str, str] | AttrTypedDict
+  user: dict[str, str] | AttrTypedDict
   h_accesskey: str
   h_autocapitalize: str
   h_autofocus: bool
