@@ -29,6 +29,18 @@ class TestDataAttribute():
   def test_creating_a_data_attribute_with_multiple_values(self): 
     assert Foo(data={"baz": "foo", "quux": "fred"}).render_inline() == '<foo data-baz="foo" data-quux="fred"></foo>' 
 
+  def test_creating_a_data_attribute_with_a_typed_dict(self): 
+    class DataAttr1(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    class DataAttr2(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    assert Foo(data=DataAttr1(bar="quux")).render_inline() == '<foo data-bar="quux"></foo>'   
+    assert Foo(data=DataAttr1(bar="quux") | DataAttr2(baz="fred")).render_inline() == '<foo data-bar="quux" data-baz="fred"></foo>' 
+
 class TestAriaAttribute():
   def test_creating_an_aria_attribute(self): 
     assert Foo(aria={"baz": "foo"}).render_inline() == '<foo aria-baz="foo"></foo>'   
@@ -38,6 +50,18 @@ class TestAriaAttribute():
 
   def test_creating_an_aria_attribute_with_multiple_values(self): 
     assert Foo(aria={"baz": "foo", "quux": "fred"}).render_inline() == '<foo aria-baz="foo" aria-quux="fred"></foo>' 
+
+  def test_creating_a_data_attribute_with_a_typed_dict(self): 
+    class AriaAttr1(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    class AriaAttr2(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    assert Foo(aria=AriaAttr1(bar="quux")).render_inline() == '<foo aria-bar="quux"></foo>'   
+    assert Foo(aria=AriaAttr1(bar="quux") | AriaAttr2(baz="fred")).render_inline() == '<foo aria-bar="quux" aria-baz="fred"></foo>' 
 
 class TestUserAttribute():
   def test_creating_a_user_attribute(self): 
@@ -65,6 +89,6 @@ class TestUserAttribute():
       bar: str
       baz: str
 
-    assert Foo(user=UserAttr1(bar="quux")).render_inline() == '<foo bar="quux"></foo>' 
+    assert Foo(user=UserAttr1(bar="quux")).render_inline() == '<foo bar="quux"></foo>'   
     assert Foo(user=UserAttr1(bar="quux") | UserAttr2(baz="fred")).render_inline() == '<foo bar="quux" baz="fred"></foo>' 
   
