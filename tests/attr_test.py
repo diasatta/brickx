@@ -1,4 +1,6 @@
+from typing import TypedDict
 from foo_elements import Foo
+
 
 class TestTextAttribute():
   def test_setting_to_a_string(self):
@@ -53,3 +55,16 @@ class TestUserAttribute():
 
   def test_creating_a_user_attribute_with_multiple_values(self): 
     assert Foo(user={"baz": "foo", "quux": "fred"}).render_inline() == '<foo baz="foo" quux="fred"></foo>' 
+
+  def test_creating_a_user_attribute_with_a_typed_dict(self): 
+    class UserAttr1(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    class UserAttr2(TypedDict, total=False):
+      bar: str
+      baz: str
+
+    assert Foo(user=UserAttr1(bar="quux")).render_inline() == '<foo bar="quux"></foo>' 
+    assert Foo(user=UserAttr1(bar="quux") | UserAttr2(baz="fred")).render_inline() == '<foo bar="quux" baz="fred"></foo>' 
+  
