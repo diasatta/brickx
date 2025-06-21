@@ -1,8 +1,6 @@
 from typing import cast, Unpack
-from brickx.node import Node, Element, Container
+from brickx.node import Element, Container, Child
 from brickx.attrs import *
-from brickx.style import Rule
-
 
 #region A
 class A(Container):
@@ -12,8 +10,8 @@ class A(Container):
   tag_name: str = "a"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[AAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[AAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> AAttrs:
@@ -51,8 +49,6 @@ class Article(Container):
   """
   tag_name: str = "article"
 
-  # TODO cast
-
 class Aside(Container):
   """
   Represents a portion of a document whose content is only indirectly related to the document's main content. Asides are frequently presented as sidebars or call-out boxes.
@@ -65,8 +61,8 @@ class Audio(Container):
   """
   tag_name: str = "audio"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[AudioAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[AudioAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> AudioAttrs:
@@ -115,8 +111,8 @@ class Blockquote(Container):
   """
   tag_name: str = "blockquote"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[BlockquoteAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[BlockquoteAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> BlockquoteAttrs:
@@ -128,8 +124,8 @@ class Body(Container):
   """
   tag_name: str = "body"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[BodyAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[BodyAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> BodyAttrs:
@@ -148,8 +144,8 @@ class Button(Container):
   tag_name: str = "button"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ButtonAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ButtonAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ButtonAttrs:
@@ -163,13 +159,13 @@ class Canvas(Container):
   """
   tag_name: str = "canvas"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[CanvasAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
-
+  def __init__(self, *children: Child, **attrs: Unpack[CanvasAttrs]) -> None:
+    super().__init__(*children, **attrs)
+  
   @property
   def attrs(self) -> CanvasAttrs:
     return cast(CanvasAttrs, self._attrs)
-
+  
 class Caption(Container):
   """
   Specifies the caption (or title) of a table.
@@ -210,8 +206,8 @@ class Colgroup(Container):
   """
   tag_name: str = "colgroup"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ColgroupAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ColgroupAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ColgroupAttrs:
@@ -225,13 +221,13 @@ class Data(Container):
   """
   tag_name: str = "data"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[DataAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[DataAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> DataAttrs:
     return cast(DataAttrs, self._attrs)
-
+  
 class Datalist(Container):
   """
   Contains a set of `option` elements that represent the permissible or recommended options available to choose from within other controls.
@@ -251,26 +247,26 @@ class Del(Container):
   tag_name: str = "del"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[DelAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[DelAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> DelAttrs:
     return cast(DelAttrs, self._attrs)
-
+  
 class Details(Container):
   """
   Creates a disclosure widget in which information is visible only when the widget is toggled into an 'open' state. A summary or label must be provided using the `summary` element.
   """
   tag_name: str = "details"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[DetailsAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[DetailsAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> DetailsAttrs:
     return cast(DetailsAttrs, self._attrs)
-
+  
 class Dfn(Container):
   """
   Used to indicate the term being defined within the context of a definition phrase or sentence. The ancestor `p` element, the `dt`/`dd` pairing, or the nearest section ancestor of the `dfn` element, is considered to be the definition of the term.
@@ -284,13 +280,13 @@ class Dialog(Container):
   """
   tag_name: str = "dialog"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[DialogAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[DialogAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> DialogAttrs:
     return cast(DialogAttrs, self._attrs)
-
+  
 class Div(Container):
   """
   The generic container for flow content. It has no effect on the content or layout until styled in some way using CSS (e.g., styling is directly applied to it, or some kind of layout model like flexbox is applied to its parent element).
@@ -339,13 +335,13 @@ class Fieldset(Container):
   """
   tag_name: str = "fieldset"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[FieldsetAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[FieldsetAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> FieldsetAttrs:
     return cast(FieldsetAttrs, self._attrs)
-
+  
 class Figcaption(Container):
   """
   Represents a caption or legend describing the rest of the contents of its parent `figure` element.
@@ -370,13 +366,13 @@ class Form(Container):
   """
   tag_name: str = "form"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[FormAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[FormAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> FormAttrs:
     return cast(FormAttrs, self._attrs)
-
+  
 #endregion
 #region H
 class H1(Container):
@@ -462,6 +458,7 @@ class Html(Container):
     return cast(HtmlAttrs, self._attrs)
   
   def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
+    # TODO: review 
     return "<!DOCTYPE html>\n" + super().render(level, spaces, escape) 
 
 #endregion
@@ -479,13 +476,13 @@ class Iframe(Container):
   """
   tag_name: str = "iframe"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[IframeAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[IframeAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> IframeAttrs:
     return cast(IframeAttrs, self._attrs)
-
+  
 class Img(Element):
   """
   Embeds an image into the document.
@@ -519,13 +516,13 @@ class Ins(Container):
   tag_name: str = "ins"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[InsAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[InsAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> InsAttrs:
     return cast(InsAttrs, self._attrs)
-
+  
 #endregion
 #region K
 class Kbd(Container):
@@ -544,13 +541,13 @@ class Label(Container):
   tag_name: str = "label"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[LabelAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[LabelAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> LabelAttrs:
     return cast(LabelAttrs, self._attrs)
-
+  
 class Legend(Container):
   """
   Represents a caption for the content of its parent `fieldset`.
@@ -565,13 +562,13 @@ class Li(Container):
   tag_name: str = "li"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[LiAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[LiAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> LiAttrs:
     return cast(LiAttrs, self._attrs)
-
+  
 class Link(Element):
   """
   Specifies relationships between the current document and an external resource. This element is most commonly used to link to CSS but is also used to establish site icons (both 'favicon' style icons and icons for the home screen and apps on mobile devices) among other things.
@@ -588,10 +585,10 @@ class Link(Element):
     return cast(LinkAttrs, self._attrs)
   
   def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
-    if self.attrs.get("h_rel", "") == "stylesheet" and self.folder_path:
+    if self.attrs.get("rel", "") == "stylesheet" and self.folder_path:
       if self.parent:
           path = self.parent.style_file_name(self.folder_path)
-          self.attrs["h_href"] = path
+          self.attrs["href"] = path
           self.parent.write_style_file(self.folder_path)    
 
     return super().render(level, spaces, escape)
@@ -610,13 +607,13 @@ class Map(Container):
   """
   tag_name: str = "map"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[MapAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[MapAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> MapAttrs:
     return cast(MapAttrs, self._attrs)
-
+  
 class Mark(Container):
   """
   Represents text which is marked or highlighted for reference or notation purposes due to the marked passage's relevance in the enclosing context.
@@ -649,13 +646,13 @@ class Meter(Container):
   """
   tag_name: str = "meter"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[MeterAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[MeterAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> MeterAttrs:
     return cast(MeterAttrs, self._attrs)
-
+  
 #endregion
 #region N
 class Nav(Container):
@@ -679,39 +676,39 @@ class Object(Container):
   """
   tag_name: str = "object"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ObjectAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ObjectAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ObjectAttrs:
     return cast(ObjectAttrs, self._attrs)
-
+  
 class Ol(Container):
   """
   Represents an ordered list of items — typically rendered as a numbered list.
   """
   tag_name: str = "ol"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[OlAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[OlAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> OlAttrs:
     return cast(OlAttrs, self._attrs)
-
+  
 class Optgroup(Container):
   """
   Creates a grouping of options within a `select` element.
   """
   tag_name: str = "optgroup"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[OptgroupAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[OptgroupAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> OptgroupAttrs:
     return cast(OptgroupAttrs, self._attrs)
-
+  
 class Option(Container):
   """
   Used to define an item contained in a select, an `optgroup`, or a `datalist` element. As such, `option` can represent menu items in popups and other lists of items in an HTML document.
@@ -719,26 +716,26 @@ class Option(Container):
   tag_name: str = "option"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[OptionAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[OptionAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> OptionAttrs:
     return cast(OptionAttrs, self._attrs)
-
+  
 class Output(Container):
   """
   Container element into which a site or app can inject the results of a calculation or the outcome of a user action.
   """
   tag_name: str = "output"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[OutputAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[OutputAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> OutputAttrs:
     return cast(OutputAttrs, self._attrs)
-
+  
 #endregion
 #region P
 class P(Container):
@@ -766,13 +763,13 @@ class Progress(Container):
   """
   tag_name: str = "progress"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ProgressAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ProgressAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ProgressAttrs:
     return cast(ProgressAttrs, self._attrs)
-
+  
 #endregion
 #region Q
 class Q(Container):
@@ -782,13 +779,13 @@ class Q(Container):
   tag_name: str = "q"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[QAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[QAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> QAttrs:
     return cast(QAttrs, self._attrs)
-
+  
 #endregion
 #region R
 class Rp(Container):
@@ -834,13 +831,13 @@ class Script(Container):
   """
   tag_name: str = "script"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ScriptAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ScriptAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ScriptAttrs:
     return cast(ScriptAttrs, self._attrs)
-
+  
 class Section(Container):
   """
   Represents a generic standalone section of a document, which doesn't have a more specific semantic element to represent it. Sections should always have a heading, with very few exceptions.
@@ -853,26 +850,26 @@ class Select(Container):
   """
   tag_name: str = "select"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[SelectAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[SelectAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> SelectAttrs:
     return cast(SelectAttrs, self._attrs)
-
+  
 class Slot(Container):
   """
   Part of the Web Components technology suite, this element is a placeholder inside a web component that you can fill with your own markup, which lets you create separate DOM trees and present them together.
   """
   tag_name: str = "slot"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[SlotAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[SlotAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> SlotAttrs:
     return cast(SlotAttrs, self._attrs)
-
+  
 class Small(Container):
   """
   Represents side-comments and small print, like copyright and legal text, independent of its styled presentation. By default, it renders text within it one font size smaller, such as from 'small' to 'x-small'.
@@ -913,13 +910,13 @@ class Style(Container):
   """
   tag_name: str = "style"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[StyleAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
-
+  def __init__(self, *children: Child, **attrs: Unpack[StyleAttrs]) -> None:
+    super().__init__(*children, **attrs)
+  
   @property
   def attrs(self) -> StyleAttrs:
     return cast(StyleAttrs, self._attrs)
-  
+
   def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
     if self.parent:
       self.insert(self.parent.render_style())  
@@ -973,13 +970,13 @@ class Td(Container):
   tag_name: str = "td"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[TdAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[TdAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> TdAttrs:
     return cast(TdAttrs, self._attrs)
-
+  
 class Template(Container):
   """
   A mechanism for holding HTML that is not to be rendered immediately when a page is loaded but may be instantiated subsequently during runtime using JavaScript.
@@ -992,13 +989,13 @@ class Textarea(Container):
   """
   tag_name: str = "textarea"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[TextareaAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[TextareaAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> TextareaAttrs:
     return cast(TextareaAttrs, self._attrs)
-
+  
 class Tfoot(Container):
   """
   Encapsulates a set of table rows (`tr` elements), indicating that they comprise the foot of a table with information about the table's columns. This is usually a summary of the columns, e.g., a sum of the given numbers in a column.
@@ -1012,13 +1009,13 @@ class Th(Container):
   tag_name: str = "th"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[ThAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[ThAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> ThAttrs:
     return cast(ThAttrs, self._attrs)
-
+  
 class Thead(Container):
   """
   Encapsulates a set of table rows (`tr` elements), indicating that they comprise the head of a table with information about the table's columns. This is usually in the form of column headers (`th` elements).
@@ -1032,13 +1029,13 @@ class Time(Container):
   tag_name: str = "time"
   inline: bool = True
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[TimeAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[TimeAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> TimeAttrs:
     return cast(TimeAttrs, self._attrs)
-
+  
 class Title(Container):
   """
   Defines the document's title that is shown in a browser's title bar or a page's tab. It only contains text; tags within the element are ignored.
@@ -1095,13 +1092,13 @@ class Video(Container):
   """
   tag_name: str = "video"
 
-  def __init__(self, *children: Node | str | int | float, style: Rule | list[Rule] | None = None, **attrs: Unpack[VideoAttrs]) -> None:
-    super().__init__(*children, style=style, **attrs)
+  def __init__(self, *children: Child, **attrs: Unpack[VideoAttrs]) -> None:
+    super().__init__(*children, **attrs)
 
   @property
   def attrs(self) -> VideoAttrs:
     return cast(VideoAttrs, self._attrs)
-
+  
 #endregion
 #region W
 class Wbr(Element):

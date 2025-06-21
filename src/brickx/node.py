@@ -3,7 +3,7 @@ from abc import ABC
 from contextvars import ContextVar
 from uuid import uuid4
 from copy import deepcopy
-from typing import cast, Unpack
+from typing import cast, Unpack, Self, TypeAlias
 import html, hashlib
 from brickx.attrs import GlobalAttrs
 from brickx.style import Rule
@@ -142,21 +142,50 @@ class Text(Node):
 class Element(Node): 
   tag_name: str = "element"
 
-  def __init__(self, style: Rule | list[Rule] | None = None, **attrs: Unpack[GlobalAttrs]) -> None:
+  def __init__(self, **attrs: Unpack[GlobalAttrs]) -> None:
     super().__init__()
-
-    self._attrs: dict[str, str | dict[str, str]] = {}
-
-    if style is not None:
-        self.style = style
-
-    for attr in attrs:
-      if attr.startswith(("h_", "data", "aria", "user", "hx_")):
-        self._attrs[attr] = attrs[attr]
-
+    
+    self._attrs: GlobalAttrs = attrs
+  
   @property
   def attrs(self) -> GlobalAttrs:
-    return cast(GlobalAttrs, self._attrs) 
+    return cast(GlobalAttrs, self._attrs)
+
+  # TODO: review
+  def __call__(self, *styles: Rule) -> Self:
+    for style in styles:
+      self.style = style
+
+    return self
+
+  def _attr(self, name: str) -> dict[str, str]:   
+    if name not in self._attrs: 
+      self._attrs[name] = {}
+    return cast(dict[str, str], self._attrs[name])
+  
+  @property
+  def data(self) -> dict[str, str]: 
+    return self._attr("data")  
+  
+  @data.setter
+  def data(self, attrs: dict[str, str]):   
+    self._attrs["data"] = attrs
+
+  @property
+  def aria(self) -> dict[str, str]: 
+    return self._attr("aria")  
+  
+  @aria.setter
+  def aria(self, attrs: dict[str, str]):   
+    self._attrs["aria"] = attrs
+
+  @property
+  def user(self) -> dict[str, str]: 
+    return self._attr("user")  
+  
+  @user.setter
+  def user(self, attrs: dict[str, str]):   
+    self._attrs["user"] = attrs
 
   @property
   def style(self) -> StyleDict:
@@ -166,9 +195,8 @@ class Element(Node):
   def style(self, rules: Rule | list[Rule]): 
     self.styler.style = rules
 
-  def render_attr(self, name: str, value: str | bool | None | dict[str, str], remove_prefix: bool = True) -> str:
-    name = name.removeprefix("h_") if remove_prefix else name
-    name = name.replace("_", "-")
+  def render_attr(self, name: str, value: str | bool | None | dict[str, str]) -> str:
+    name = name.removesuffix("_").replace("_", "-") if name != "_" else name
 
     if type(value) == bool:
       if value:
@@ -183,15 +211,15 @@ class Element(Node):
     return f'{name}="{html.escape(str(value), quote=True)}"'
 
   def render_attrs(self) -> str:
-    classes = self.attrs.get("h_class", "")
+    classes = self._attrs.get("class_", [])
     class_names = self.class_names()
 
     if class_names:
-      class_names.append(classes)
-      self.attrs["h_class"] = " ".join(class_names).strip()
+      class_names += classes
+      self._attrs["class_"] = class_names
 
     if self._styler.declarations():
-      self.attrs["h_style"] = " ".join(self._styler.declarations())
+      self._attrs["style"] = " ".join(self._styler.declarations())
 
     attrs: list[str] = []
     output = ""
@@ -201,20 +229,24 @@ class Element(Node):
           l = []
           for k, v in value.items():
             if key == "user":
-              l.append(self.render_attr(f'{k}', v, False))
+              l.append(self.render_attr(f'{k}', v))
             else:
               l.append(self.render_attr(f'{key}-{k}', v))
 
             output = " ".join(l)
         else:
           raise TypeError(f"Dict. values not allowed for attribute '{key}'.")
-      else:
+      elif type(value) == list:
+        output = self.render_attr(key, " ".join(value))
+      elif type(value) == bool:
         output = self.render_attr(key, value)
+      else:
+        output = self.render_attr(key, str(value))
 
       attrs.append(output)
 
     if classes:
-      self.attrs["h_class"] = classes
+      self._attrs["class_"] = classes
 
     return " ".join(attrs).strip()
   
@@ -252,13 +284,15 @@ class Element(Node):
     with open(file_path, "w") as f:
       f.write(self.render_style())
 
+Child: TypeAlias = Node | str | int | float
+
 class Container(Element):
   tag_name: str = "container"
 
   _with_stack: dict[str | None, list[list["Node"]]] = {}
 
-  def __init__(self, *nodes: Node | str | int | float | None, style: Rule | list[Rule] | None = None, **attrs: Unpack[GlobalAttrs]) -> None:
-    super().__init__(style=style, **attrs)
+  def __init__(self, *nodes: Node | str | int | float | None, **attrs: Unpack[GlobalAttrs]) -> None:
+    super().__init__(**attrs)
 
     self._nodes: list[Node] = []
 
