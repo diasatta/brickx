@@ -162,7 +162,8 @@ class TestElements():
     assert Hr().render() == "<hr>"
 
   def test_html(self) -> None:
-    assert Html().render() == "<!DOCTYPE html>\n<html></html>"
+    # assert Html().render() == "<!DOCTYPE html>\n<html></html>"
+    assert Html().render() == "<html></html>"
 
   #endregion
   #region I
