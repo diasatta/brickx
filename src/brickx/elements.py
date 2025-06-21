@@ -1,5 +1,5 @@
 from typing import cast, Unpack
-from brickx.node import Element, Container, Child
+from brickx.node import Element, Container, Root, Child
 from brickx.attrs import *
 
 #region A
@@ -305,6 +305,12 @@ class Dt(Container):
   """
   tag_name: str = "dt"
 
+class Doctype(Element):
+  tag_name: str = "!DOCTYPE"  
+
+  def __init__(self) -> None:
+    super().__init__(html=True) # type: ignore
+
 #endregion
 #region E
 class Em(Container):
@@ -457,10 +463,6 @@ class Html(Container):
   def attrs(self) -> HtmlAttrs:
     return cast(HtmlAttrs, self._attrs)
   
-  def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
-    # TODO: review 
-    return "<!DOCTYPE html>\n" + super().render(level, spaces, escape) 
-
 #endregion
 #region I
 class I(Container):
@@ -1109,3 +1111,37 @@ class Wbr(Element):
   inline: bool = True
 
 #endregion
+
+class Document(Root):
+  """
+  Represents a html document. This is a helper element equivalent to:
+  ```
+  <!DOCTYPE html>
+  <html>
+    <head></head>
+    <body></body>
+  </html>
+  ```
+
+  Argument:
+    `nodes`: children to pass to the `body` element.
+
+  Properties:
+    - `doctype`: returns the `doctype` element
+    - `html`: returns the `html` element
+    - `head`: returns the `head` element
+    - `body`: returns the `body` element
+  """
+
+  tag_name: str = "document"
+  inline: bool = False
+
+  def __init__(self, *nodes: Child) -> None:
+    super().__init__()
+
+    self.doctype = Doctype()
+    self.html = Html()
+    self.body = Body(*nodes)
+    self.head = Head()
+
+    self.doctype + (self.head + self.body >> self.html) >> self
