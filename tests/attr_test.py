@@ -1,94 +1,117 @@
-from typing import TypedDict
-from foo_elements import Foo
-
+from typing import Unpack, TypedDict
+from foo_elements import Foo, Bar, Baz, Quux, Fred
 
 class TestTextAttribute():
   def test_setting_to_a_string(self):
-    assert Foo(h_class="baz").render_inline() == '<foo class="baz"></foo>'
+    assert Foo(id="quux").render_inline() == '<foo id="quux"></foo>'
+
+  def test_setting_to_a_list(self):
+    assert Foo(class_=["baz"]).render_inline() == '<foo class="baz"></foo>'
 
   def test_setting_multiple_attributes(self):
-    assert Foo(h_class="baz", h_id="quux", h_autofocus=True).render_inline() == '<foo class="baz" id="quux" autofocus></foo>'
+    assert Foo(class_=["baz"], id="quux", autofocus=True).render_inline() == '<foo class="baz" id="quux" autofocus></foo>'
 
   def test_setting_to_an_empty_string(self):
-    assert Foo(h_class="").render_inline() == '<foo class=""></foo>'  
+    assert Foo(id="").render_inline() == '<foo id=""></foo>'  
+
+  def test_setting_to_an_empty_list(self):
+    assert Foo(class_=[]).render_inline() == '<foo class=""></foo>'  
+
+  def test_updating_wita_string(self):
+    foo = Foo()
+    foo._attrs["id"] = "quux"
+    assert foo.render_inline() == '<foo id="quux"></foo>'
+
+    foo._attrs["autofocus"] = True
+    assert foo.render_inline() == '<foo id="quux" autofocus></foo>'
+
+  def test_updating_wita_list(self):
+    foo = Foo()
+    foo._attrs["class_"] = ["bar"]
+    foo._attrs["class_"] += ["baz", "foo"]
+    assert foo.render_inline() == '<foo class="bar baz foo"></foo>'
 
 class TestBooleanAttribute():
   def test_setting_to_true(self):
-    assert Foo(h_autofocus=True).render_inline() == "<foo autofocus></foo>"
+    assert Foo(autofocus=True).render_inline() == "<foo autofocus></foo>"
 
   def test_setting_to_false(self):
-    assert Foo(h_autofocus=False).render_inline() == "<foo></foo>"
+    assert Foo(autofocus=False).render_inline() == "<foo></foo>"
 
 class TestDataAttribute():
-  def test_creating_a_data_attribute(self): 
-    assert Foo(data={"baz": "foo"}).render_inline() == '<foo data-baz="foo"></foo>'   
+  def test_creating_a_data_attribute_in_constructor(self): 
+    foo = Foo(data={"baz": "foo"})
+    assert foo.render_inline() == '<foo data-baz="foo"></foo>' 
 
-  def test_creating_a_data_attribute_with_underscore(self): 
+  def test_creating_a_data_attribute_using_assignment(self): 
+    foo = Foo()
+    # foo.attrs["data"]["bar"] = "foo" # type check error
+    foo.data["bar"] = "foo" # no type check error
+    assert foo.render_inline() == '<foo data-bar="foo"></foo>' 
+
+    foo.attrs["data"] = {"bar": "quux"}
+    assert foo.render_inline() == '<foo data-bar="quux"></foo>' 
+
+    foo.data = {"bar": "fred"}
+    # foo.attrs["class"] += ["r"]
+    assert foo.render_inline() == '<foo data-bar="fred"></foo>' 
+
+  def test_creating_a_data_attribute_witdash(self): 
     assert Foo(data={"baz-bar": "foo"}).render_inline() == '<foo data-baz-bar="foo"></foo>'   
 
-  def test_creating_a_data_attribute_with_multiple_values(self): 
+  def test_creating_a_data_attribute_witmultiple_values(self): 
     assert Foo(data={"baz": "foo", "quux": "fred"}).render_inline() == '<foo data-baz="foo" data-quux="fred"></foo>' 
 
-  def test_creating_a_data_attribute_with_a_typed_dict(self): 
-    class DataAttr1(TypedDict, total=False):
+  def test_creating_a_data_attribute_with_autocompletion(self): 
+    class FooAttrs(TypedDict, total=False):
       bar: str
-      baz: str
+      quux: str
 
-    class DataAttr2(TypedDict, total=False):
-      bar: str
-      baz: str
+    def foo(**attrs: Unpack[FooAttrs]) -> dict[str, str]:
+      d: dict[str, str] = {}
+      for attr in attrs:
+        d[attr] = attrs[attr]
 
-    assert Foo(data=DataAttr1(bar="quux")).render_inline() == '<foo data-bar="quux"></foo>'   
-    assert Foo(data=DataAttr1(bar="quux") | DataAttr2(baz="fred")).render_inline() == '<foo data-bar="quux" data-baz="fred"></foo>' 
+      return d
+    
+    assert Foo(data=foo(bar="baz")).render_inline() == '<foo data-bar="baz"></foo>' 
+
+    class BarAttrs(TypedDict, total=False):
+      foo: str
+      fred: str
+
+    def bar(**attrs: Unpack[BarAttrs]) -> dict[str, str]:
+      d: dict[str, str] = {}
+      for attr in attrs:
+        d[attr] = attrs[attr]
+
+      return d
+
+    assert Foo(data=foo(bar="baz") | bar(foo="quux", fred="baz")).render_inline() == '<foo data-bar="baz" data-foo="quux" data-fred="baz"></foo>' 
 
 class TestAriaAttribute():
   def test_creating_an_aria_attribute(self): 
     assert Foo(aria={"baz": "foo"}).render_inline() == '<foo aria-baz="foo"></foo>'   
 
-  def test_creating_an_aria_attribute_with_underscore(self): 
+  def test_creating_an_aria_attribute_witunderscore(self): 
     assert Foo(aria={"baz-bar": "foo"}).render_inline() == '<foo aria-baz-bar="foo"></foo>'   
 
-  def test_creating_an_aria_attribute_with_multiple_values(self): 
+  def test_creating_an_aria_attribute_witmultiple_values(self): 
     assert Foo(aria={"baz": "foo", "quux": "fred"}).render_inline() == '<foo aria-baz="foo" aria-quux="fred"></foo>' 
-
-  def test_creating_a_data_attribute_with_a_typed_dict(self): 
-    class AriaAttr1(TypedDict, total=False):
-      bar: str
-      baz: str
-
-    class AriaAttr2(TypedDict, total=False):
-      bar: str
-      baz: str
-
-    assert Foo(aria=AriaAttr1(bar="quux")).render_inline() == '<foo aria-bar="quux"></foo>'   
-    assert Foo(aria=AriaAttr1(bar="quux") | AriaAttr2(baz="fred")).render_inline() == '<foo aria-bar="quux" aria-baz="fred"></foo>' 
 
 class TestUserAttribute():
   def test_creating_a_user_attribute(self): 
     assert Foo(user={"baz": "foo"}).render_inline() == '<foo baz="foo"></foo>' 
 
-  def test_creating_a_user_attribute_with_underscore(self): 
+  def test_creating_a_user_attribute_witunderscore(self): 
     assert Foo(user={"baz-bar": "foo"}).render_inline() == '<foo baz-bar="foo"></foo>' 
-    assert Foo(user={"h_class": "foo"}).render_inline() == '<foo h-class="foo"></foo>' 
-    assert Foo(user={"h_": "foo"}).render_inline() == '<foo h-="foo"></foo>'   
+    assert Foo(user={"class": "foo"}).render_inline() == '<foo class="foo"></foo>' 
+    assert Foo(user={"": "foo"}).render_inline() == '<foo ="foo"></foo>'   
     assert Foo(user={"foo_bar": "baz"}).render_inline() == '<foo foo-bar="baz"></foo>'   
     assert Foo(user={"": "baz"}).render_inline() == '<foo ="baz"></foo>'   
 
-  def test_creating_a_standard_attribute_with_user_syntax(self): 
+  def test_creating_a_standard_attribute_wituser_syntax(self): 
     assert Foo(user={"class": "foo"}).render_inline() == '<foo class="foo"></foo>' 
 
-  def test_creating_a_user_attribute_with_multiple_values(self): 
+  def test_creating_a_user_attribute_witmultiple_values(self): 
     assert Foo(user={"baz": "foo", "quux": "fred"}).render_inline() == '<foo baz="foo" quux="fred"></foo>' 
-
-  def test_creating_a_user_attribute_with_a_typed_dict(self): 
-    class UserAttr1(TypedDict, total=False):
-      bar: str
-      baz: str
-
-    class UserAttr2(TypedDict, total=False):
-      bar: str
-      baz: str
-
-    assert Foo(user=UserAttr1(bar="quux")).render_inline() == '<foo bar="quux"></foo>'   
-    assert Foo(user=UserAttr1(bar="quux") | UserAttr2(baz="fred")).render_inline() == '<foo bar="quux" baz="fred"></foo>' 
-  

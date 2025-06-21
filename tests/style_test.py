@@ -563,7 +563,7 @@ class TestElementStyling():
       }
     }
 
-    foo = Element(style=[style["rule1"], style["rule2"]])  
+    foo = Element()(style["rule1"], style["rule2"])  
     foo.styler = SpecificStyler()
     assert foo.render_inline() == '<element class="se6dacc8">'
 
@@ -599,7 +599,7 @@ class TestElementStyling():
       }
     }
 
-    foo = Element(style=[style["rule1"], style["rule2"]])  
+    foo = Element()(style["rule1"], style["rule2"])  
     foo.styler = AtomicStyler()
     assert foo.render_inline() == '<element class="a6fa6fa2 a94fac93 a5bc668f1">'
 
@@ -631,7 +631,7 @@ class TestElementStyling():
       }
     }
 
-    foo = Element(style=[style["rule1"], style["rule2"]])  
+    foo = Element()(style["rule1"], style["rule2"])
     foo.styler = InlineStyler()
 
     assert foo.render_inline() == '<element style="background-color: blue; color: black;">'
@@ -656,9 +656,9 @@ class TestElementStyling():
       }
     }
 
-    baz = Element(style=style["rule3"])
-    foo = Container(baz, style=style["rule1"])
-    bar = Container(foo, style=style["rule2"])
+    baz = Element()(style["rule3"])
+    foo = Container(baz)(style["rule1"])
+    bar = Container(foo)(style["rule2"])
     bar.styler = SpecificStyler()
 
     assert bar.render_style() == \
