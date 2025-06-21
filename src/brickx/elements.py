@@ -1,6 +1,7 @@
-from typing import cast, Unpack
+from typing import Self, cast, Unpack
 from brickx.node import Element, Container, Root, Child
 from brickx.attrs import *
+from brickx.style import Rule
 
 #region A
 class A(Container):
@@ -577,14 +578,18 @@ class Link(Element):
   """
   tag_name: str = "link"
 
-  def __init__(self, folder_path: str = "", **attrs: Unpack[LinkAttrs]) -> None:
+  def __init__(self, **attrs: Unpack[LinkAttrs]) -> None:
     super().__init__(**attrs)
 
-    self.folder_path: str = folder_path
+    self.folder_path: str = ""
   
   @property
   def attrs(self) -> LinkAttrs:
     return cast(LinkAttrs, self._attrs)
+  
+  def __call__(self, *styles: Rule, folder_path: str = "") -> Self:
+    self.folder_path = folder_path
+    return super().__call__(*styles)
   
   def render(self, level: int = 0, spaces: int | None = 2, escape: bool = False) -> str:
     if self.attrs.get("rel", "") == "stylesheet" and self.folder_path:
