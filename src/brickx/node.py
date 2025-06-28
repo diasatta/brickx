@@ -277,7 +277,7 @@ class Element(Node):
     file_name: str = self.tag_name + '-' + hashlib.sha1(style.encode()).hexdigest()[:self.styler.file_name_length]
     
     folder_path = folder_path.removesuffix("/")
-    return f"{folder_path}{"/" if folder_path else ""}{file_name}.css"
+    return f'{folder_path}{"/" if folder_path else ""}{file_name}.css'
   
   def write_style_file(self, folder_path: str = ""):
     file_path = self.style_file_name(folder_path)
